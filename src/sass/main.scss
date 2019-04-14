@@ -1,0 +1,28 @@
+.wrapper {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+  	width: $wrapper-width;
+  	height: $wrapper-width;
+  	background-color: #DDD;
+  	margin-left: auto;
+ 	margin-right: auto;
+}
+
+.button {
+	height: 50px;
+	width: 100px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+.menu {
+	display: flex;
+	width: 500px;
+	height: 100px;
+	background-color: #DFD;
+	margin-left: auto;
+	margin-right: auto;
+}

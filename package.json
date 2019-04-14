@@ -1,0 +1,29 @@
+{
+  "name": "game of life",
+  "version": "1.0.0",
+  "description": "my test dir with game of life",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "vasreb",
+  "license": "ISC",
+  "devDependencies": {
+    "browser-sync": "^2.26.3",
+    "del": "^4.1.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-csso": "^3.0.1",
+    "gulp-html-minifier": "^0.1.8",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-plumber": "^1.2.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-svgmin": "^2.1.0",
+    "gulp-svgstore": "^7.0.1",
+    "gulp-terser": "^1.1.7",
+    "gulp-uglify": "^3.0.2",
+    "gulp-webp": "^4.0.1"
+  }
+}
