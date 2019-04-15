@@ -68,7 +68,7 @@ class Field {
 		}
 		nodeElement.style.cssText = `
 			box-sizing: border-box;
-			border: ${this._nodeSize*0.02}px solid black; 
+			border: ${this._nodeSize*0.01}px solid black; 
 			background-color: ${color};
 			height: ${this._nodeSize}px;
 			width: ${this._nodeSize}px;
@@ -198,6 +198,9 @@ class Field {
 	}
 }
 
+class Node {
+
+}
 
 const wrapper = document.querySelector('.wrapper');
 const button = document.querySelector('.button');
@@ -207,9 +210,10 @@ button.timer = 0;
 let options = {};
 options.size = prompt('size {cells}', '40');
 options.nodeSize = prompt('size of cell {px}', '20');
-options.alifeRule1 = prompt('count of alife cells around then cell will live', '3');
-options.alifeRule2 = prompt('min of alife neighbours for living', '2');
-options.alifeRule3 = prompt('max of alife neighbours for living', '3');
+options.alifeRule1 = prompt('count of alive cells around then cell will live', '3');
+options.alifeRule2 = prompt('min of alive neighbours for living', '2');
+options.alifeRule3 = prompt('max of alive neighbours for living', '3');
+let frequency = prompt('frequency {ms}', '100');
 
 let university = new Field(wrapper, options);
 
@@ -221,7 +225,7 @@ button.addEventListener('click', () => {
 
 			button.timer = setInterval(() => {
 				button.innerHTML = university.updateMap();
-			}, 200);
+			}, frequency);
 		} else {
 			clearInterval(button.timer);
 			button.on = false;
