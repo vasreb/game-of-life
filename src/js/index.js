@@ -30,6 +30,17 @@ class Field {
 		};
 		wrap.style.width = `${size * nodeSize}px`;
 		wrap.style.height = `${size * nodeSize}px`;
+		wrap.addEventListener('mousedown', (event) => {
+			event.preventDefault();
+			this._recX1 = event.target.x;
+			this._recY1 = event.target.y;
+		})
+		wrap.addEventListener('mouseup', (event) => {
+			event.preventDefault();
+			this._recX2 = event.target.x;
+			this._recY2 = event.target.y;
+			this.fillRectangle();
+		});
 
 		this._field[Symbol.iterator] = function () {
 			let currentX = 0;
@@ -75,15 +86,6 @@ class Field {
 			font-family: Arial;
 			text-align: center;
 			color: white;`;
-		nodeElement.addEventListener('mousedown', () => {
-			this._recX1 = node.x;
-			this._recY1 = node.y;
-		})
-		nodeElement.addEventListener('mouseup', () => {
-			this._recX2 = node.x;
-			this._recY2 = node.y;
-			this.fillRectangle();
-		});
 		this._wrap.append(nodeElement);
 	}
 
@@ -221,13 +223,11 @@ let university = new Field(wrapper, options);
 
 button.addEventListener('click', () => {
 		if (!button.on) {
-			button.on = true;
-
 			button.timer = setInterval(() => {
 				button.innerHTML = university.updateMap();
 			}, frequency);
 		} else {
 			clearInterval(button.timer);
-			button.on = false;
 		}
+		button.on = !button.on;
 });
