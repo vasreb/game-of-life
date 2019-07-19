@@ -1,28 +1,35 @@
 .wrapper {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-  	width: $wrapper-width;
-  	height: $wrapper-width;
-  	background-color: #DDD;
-  	margin-left: auto;
- 	margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: $wrapper-width;
+  height: $wrapper-width;
+  background-color: #ddd;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .button {
-	height: 50px;
-	width: 100px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: auto;
-	margin-bottom: auto;
+  height: 50px;
+  width: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.update {
+  display: block;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .menu {
-	display: flex;
-	width: 500px;
-	height: 100px;
-	background-color: #DFD;
-	margin-left: auto;
-	margin-right: auto;
+  display: flex;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  align-items: flex-start;
 }

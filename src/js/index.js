@@ -1,233 +1,159 @@
-'use strict';
+"use strict";
 
-class Field {
-	constructor(wrap, {size=40, nodeSize=20, alifeRule1=3, alifeRule2=2, alifeRule3=3} ) {
-		this.alifeRule1 = alifeRule1;
-		this.alifeRule2 = alifeRule2;
-		this.alifeRule3 = alifeRule3;
-		this.newField = [];
-		this._size = size;
-		this._wrap = wrap;
-		this._nodeSize = nodeSize;
-		this._field = [];
-		this._field._size = size;
-		this._recX1;
-		this._recX2;
-		this._recY1;
-		this._recY2;
-		for (let i = 0; i < size; i++) {
-			let line = [];
-			for (let j = 0; j < size; j++) {
-				let node = {
-					x: j,
-					y: i,
-					h: false
-				};
-				this.createNode(node);
-				line.push(node);
-			};
-			this._field.push(line);
-		};
-		wrap.style.width = `${size * nodeSize}px`;
-		wrap.style.height = `${size * nodeSize}px`;
-		wrap.addEventListener('mousedown', (event) => {
-			event.preventDefault();
-			this._recX1 = event.target.x;
-			this._recY1 = event.target.y;
-		})
-		wrap.addEventListener('mouseup', (event) => {
-			event.preventDefault();
-			this._recX2 = event.target.x;
-			this._recY2 = event.target.y;
-			this.fillRectangle();
-		});
+const Field = {
+  generate(wrapper, options) {
+    wrapper.innerHTML = "";
+    this.wrapper = wrapper;
+    this.options = options;
+    const { fieldSquareSize } = options;
+    this.field = Array(fieldSquareSize)
+      .fill(0)
+      .map(x => Array(fieldSquareSize).fill(0));
+    FieldRender.render();
+    this._addListeners();
+  },
+  _addListeners() {
+    this.wrapper.addEventListener("mousedown", e => {
+      e.preventDefault();
+      if (e.target.classList.contains("cell")) {
+        const { x: x1, y: y1 } = e.target;
+        self = this;
+        this.wrapper.addEventListener("mouseup", function rectangleMouseUp(e) {
+          e.preventDefault();
+          const { x: x2, y: y2 } = e.target;
+          self.wrapper.removeEventListener("mouseup", rectangleMouseUp);
+          self.fillRectangle({ x1, y1, x2, y2 });
+        });
+        FieldRender.updateRender();
+      }
+    });
+  },
+  fillRectangle({ x1, y1, x2, y2 }) {
+    let _X1, _X2, _Y1, _Y2;
+    if (x2 < x1) {
+      _X1 = x2;
+      _X2 = x1;
+    } else {
+      _X1 = x1;
+      _X2 = x2;
+    }
+    if (y2 < y1) {
+      _Y1 = y2;
+      _Y2 = y1;
+    } else {
+      _Y1 = y1;
+      _Y2 = y2;
+    }
+    for (let i = _Y1; i <= _Y2; i++) {
+      for (let j = _X1; j <= _X2; j++) {
+        this.field[i][j] = this.field[i][j] ? 0 : 1;
+      }
+    }
+    FieldRender.updateRender();
+  },
+  update() {
+    const currentField = this.field;
+    const newField = Array(currentField.length)
+      .fill(0)
+      .map(x => Array(currentField.length).fill(0));
+    currentField.forEach((row, y) => {
+      row.forEach((cellValue, x) => {
+        newField[y][x] = CellUtility.cellIsWillAlive({ x, y }, currentField)
+          ? 1
+          : 0;
+      });
+    });
+    this.field = newField;
+    FieldRender.updateRender();
+  }
+};
 
-		this._field[Symbol.iterator] = function () {
-			let currentX = 0;
-			let currentY = 0;
-			let self = this;
-			return {
-				next() {
-					if (currentX == self._size) {
-						currentX = 0;
-						currentY++;
-					}
-					if (currentY == self._size) {
-						return {
-							done: true
-						}
-					}
-					return { 
-							value: self[currentY][currentX++],
-							done: false
-					}
-				}
-			}
-		}
-	}
+const CellUtility = {
+  cellIsWillAlive({ x, y }, field) {
+    let countOfLiveNeighbors = 0;
+    field[y - 1] && field[y - 1][x - 1] && countOfLiveNeighbors++;
+    field[y - 1] && field[y - 1][x] && countOfLiveNeighbors++;
+    field[y - 1] && field[y - 1][x + 1] && countOfLiveNeighbors++;
+    field[y][x - 1] && countOfLiveNeighbors++;
+    field[y][x + 1] && countOfLiveNeighbors++;
+    field[y + 1] && field[y + 1][x - 1] && countOfLiveNeighbors++;
+    field[y + 1] && field[y + 1][x] && countOfLiveNeighbors++;
+    field[y + 1] && field[y + 1][x + 1] && countOfLiveNeighbors++;
+    if (!field[y][x] && countOfLiveNeighbors === this.options.alifeRule1) {
+      return true;
+    }
+    if (
+      field[y][x] &&
+      (countOfLiveNeighbors === this.options.alifeRule2 ||
+        countOfLiveNeighbors === this.options.alifeRule3)
+    ) {
+      return true;
+    }
+    return false;
+  }
+};
+Object.setPrototypeOf(CellUtility, Field);
 
-	createNode(node) {
-		let nodeElement = document.createElement('div');
-		node.html = nodeElement;
-		nodeElement.x = node.x;
-		nodeElement.y = node.y;
-		let color;
-		if (node.h) {
-			color = 'green';
-		} else {
-			color = '#DDD'
-		}
-		nodeElement.style.cssText = `
-			box-sizing: border-box;
-			border: ${this._nodeSize*0.01}px solid black; 
-			background-color: ${color};
-			height: ${this._nodeSize}px;
-			width: ${this._nodeSize}px;
-			font-family: Arial;
-			text-align: center;
-			color: white;`;
-		this._wrap.append(nodeElement);
-	}
+const FieldRender = {
+  render() {
+    const { cellSize } = this.options;
+    this.wrapper.style.width = `${this.field.length * cellSize}px`;
+    this.wrapper.style.height = `${this.field.length * cellSize}px`;
+    this.field.forEach((row, y) => {
+      row.forEach((cellValue, x) => {
+        const cellElement = document.createElement("div");
+        cellElement.x = x;
+        cellElement.y = y;
+        cellElement.classList.add("cell");
+        cellElement.isLife = cellValue;
+        cellElement.style.cssText = `
+        box-sizing: border-box;
+        border: ${cellSize * 0.01}px solid black; 
+        background-color: ${cellValue ? "green" : "#DDD"};
+        height: ${cellSize}px;
+        width: ${cellSize}px;
+        font-family: Arial;
+        text-align: center;
+        color: white;`;
+        this.wrapper.append(cellElement);
+      });
+    });
+    this.liveCellCollection = Array.from(this.wrapper.children);
+  },
+  updateRender() {
+    this.liveCellCollection.forEach(cellElement => {
+      const alive = this.field[cellElement.y][cellElement.x];
+      cellElement.style.backgroundColor = alive ? "green" : "#ddd";
+      cellElement.isLife = alive ? 1 : 0;
+    });
+  }
+};
+Object.setPrototypeOf(FieldRender, Field);
 
-	fillRectangle() {
-		let x1 = this._recX1;
-		let x2 = this._recX2;
-		let y1 = this._recY1;
-		let y2 = this._recY2;
-		if (this._recX2 < this._recX1) {
-			x1 = this._recX2;
-			x2 = this._recX1;
-		}
-		if (this._recY2 < this._recX1) {
-			y1 = this._recY2;
-			y2 = this._recY1;
-		}
-		for (let i = y1; i <= y2; i++) {
-			for (let j = x1; j <= x2; j++) {
-				if (this._field[i][j].h) {
-					this._field[i][j].h = false;
-					this._field[i][j].html.style.backgroundColor = "#DDD";
-				} else {
-					this._field[i][j].h = true;
-					this._field[i][j].html.style.backgroundColor = "green";
-				}
-			}
-		}
-	}
+const wrapper = document.querySelector(".wrapper");
+const updateBtn = document.querySelector(".update");
+const generateBtn = document.querySelector(".generate");
 
-	updateMap() {
-		for (let i = 0; i < this._field._size; i++) {
-			let line = [];
-			for (let j = 0; j < this._field._size; j++) {
-				let node = {};
-				node.x = this._field[i][j].x;
-				node.y = this._field[i][j].y;
-				node.h = this._field[i][j].h
-				node.html = this._field[i][j].html;
-				line.push(node);
-			}
-			this.newField._size = this._field._size;
-			this.newField.push(line);
-		}
+updateBtn.addEventListener("click", () => {
+  if (!updateBtn.on) {
+    updateBtn.timer = setInterval(() => {
+      Field.update();
+    }, Number(document.querySelector("#frequency").value));
+  } else {
+    clearInterval(updateBtn.timer);
+  }
+  updateBtn.on = !updateBtn.on;
+});
 
-		let allAlifes = 0;
-		for (let elem of this._field) {
-
-			let sum = this.countOfNeighbours(elem, this._field);
-			if (sum == this.alifeRule1) {
-				this.newField[elem.y][elem.x].h = true;
-			} 
-			if (sum < this.alifeRule2) {
-				this.newField[elem.y][elem.x].h = false;
-			}
-			if (sum > this.alifeRule3) {
-				this.newField[elem.y][elem.x].h = false;
-			}
-			if (this.newField[elem.y][elem.x].h) {
-				allAlifes++;
-				elem.html.style.backgroundColor = "green";
-			} else {
-				elem.html.style.backgroundColor = "#DDD";
-			}
-		}
-
-		for (let i = 0; i < this.newField._size; i++) {
-			for (let j = 0; j < this.newField._size; j++) {
-				this._field[i][j].x = this.newField[i][j].x;
-				this._field[i][j].y = this.newField[i][j].y;
-				this._field[i][j].h = this.newField[i][j].h;
-				this._field[i][j].html = this.newField[i][j].html;
-			}
-		}
-		return allAlifes;
-	}
-
-	countOfNeighbours (node, field) {
-		let x = node.x;
-		let y = node.y;
-		let sum = 0;
-		try {
-			if (field[y-1][x-1].h) {
-				sum++;
-			} 
-			if (field[y-1][x].h) {
-				sum++;
-			}
-			if (field[y-1][x+1].h) {
-				sum++;
-			}
-			if (field[y][x-1].h) {
-				sum++;
-			}
-			if (field[y][x+1].h) {
-				sum++;
-			}
-			if (field[y+1][x-1].h) {
-				sum++;
-			}
-			if (field[y+1][x].h) {
-				sum++;
-			}
-			if (field[y+1][x+1].h) {
-				sum++;
-			}
-			return sum;
-		} catch (err) {
-			if (err.name == 'TypeError') {
-
-			}
-		}
-	}
-}
-
-class Node {
-
-}
-
-const wrapper = document.querySelector('.wrapper');
-const button = document.querySelector('.button');
-button.on = false;
-button.timer = 0;
-
-let options = {};
-options.size = prompt('size {cells}', '40');
-options.nodeSize = prompt('size of cell {px}', '20');
-options.alifeRule1 = prompt('count of alive cells around then cell will live', '3');
-options.alifeRule2 = prompt('min of alive neighbours for living', '2');
-options.alifeRule3 = prompt('max of alive neighbours for living', '3');
-let frequency = prompt('frequency {ms}', '100');
-
-let university = new Field(wrapper, options);
-
-
-
-button.addEventListener('click', () => {
-		if (!button.on) {
-			button.timer = setInterval(() => {
-				button.innerHTML = university.updateMap();
-			}, frequency);
-		} else {
-			clearInterval(button.timer);
-		}
-		button.on = !button.on;
+generateBtn.addEventListener("click", () => {
+  const options = {
+    fieldSquareSize: Number(document.querySelector("#fieldSquareSize").value),
+    cellSize: Number(document.querySelector("#cellSize").value),
+    alifeRule1: Number(document.querySelector("#alifeRule1").value),
+    alifeRule2: Number(document.querySelector("#alifeRule2").value),
+    alifeRule3: Number(document.querySelector("#alifeRule3").value),
+    frequency: Number(document.querySelector("#frequency").value)
+  };
+  Field.generate(wrapper, options);
+  document.querySelector(".menu").style.display = "none";
 });

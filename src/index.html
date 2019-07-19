@@ -1,21 +1,46 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./build/css/style.css" />
+    <script defer src="./build/js/index.js"></script>
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="./build/css/style.css">
-  <script defer src="./build/js/index.js"></script>
-</head>
-
-<body>
-
-<div class="wrapper"></div>
-<div class="menu">
-	<button class="button">
-		UPDATE
-	</button>
-</div>
-
-
-</body>
+  <body>
+    <div class="wrapper"></div>
+    <div class="menu">
+      <label
+        >Field size<input
+          class="input"
+          value="40"
+          type="text"
+          id="fieldSquareSize"
+      /></label>
+      <label
+        >Cell size <input class="input" value="20" type="text" id="cellSize"
+      /></label>
+      <label
+        >the number of living cells around at which the cell will continue to
+        live <input class="input" type="text" value="3" id="alifeRule1"
+      /></label>
+      <label
+        >min alive neighbours for living
+        <input class="input" type="text" value="2" id="alifeRule2"
+      /></label>
+      <label
+        >max alive neighbours for living
+        <input class="input" type="text" value="3" id="alifeRule3"
+      /></label>
+      <label
+        >update frequency, ms
+        <input class="input" value="100" type="text" id="frequency"
+      /></label>
+      <button class="generate button">
+        Generate with this options
+      </button>
+    </div>
+    <button class="update button">
+      Update
+    </button>
+  </body>
 </html>
